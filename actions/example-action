@@ -1,0 +1,6 @@
+#!/usr/local/sbin/charm-env python3
+
+from lib_unifi_controller import UnificontrollerHelper
+
+helper = UnificontrollerHelper()
+helper.action_function()
