@@ -7,3 +7,7 @@ includes:
   - layer:basic
   - layer:apt
   - layer:backup
+options:
+  apt:
+    packages:
+      - unifi

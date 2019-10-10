@@ -1,13 +1,25 @@
 options:
-  string-option:
-    type: string
-    default: "Default Value"
-    description: "A short description of the configuration option"
-  boolean-option:
-    type: boolean
-    default: False
-    description: "A short description of the configuration option"
-  int-option:
-    type: int
-    default: 9001
-    description: "A short description of the configuration option"
+  install_sources:
+      type: string
+      description: "Sources for installing packages"
+      default: |
+        - deb http://www.ui.com/downloads/unifi/debian stable ubiquiti
+        - deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse
+  install_keys:
+      type: string
+      description: "Keys for intall_sources"
+      default: |
+        - 06E85760C0A52C50
+        - 0C49F3730359A14518585931BC711F9BA15703C6
+#  string-option:
+#    type: string
+#    default: "Default Value"
+#    description: "A short description of the configuration option"
+#  boolean-option:
+#    type: boolean
+#    default: False
+#    description: "A short description of the configuration option"
+#  int-option:
+#    type: int
+#    default: 9001
+#    description: "A short description of the configuration option"
