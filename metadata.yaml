@@ -1,8 +1,8 @@
 name: unifi-controller
 summary: <Fill in summary here>
-maintainer: Chris <Chris@x1c>
+maintainer: Chris Sanders <sanders.chris@gmail.com>
 description: |
-  <Multi-line description here>
+  UniFi controller for network management
 tags:
   # Replace "misc" with one or more whitelisted tags from this list:
   # https://jujucharms.com/docs/stable/authors-charm-metadata

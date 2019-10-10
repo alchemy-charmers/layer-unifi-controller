@@ -1,0 +1,6 @@
+[submodule "layers/layer-apt"]
+	path = layers/layer-apt
+	url = https://github.com/stub42/layer-apt.git
+[submodule "layers/layer-backup"]
+	path = layers/layer-backup
+	url = https://github.com/pirate-charmers/layer-backup.git

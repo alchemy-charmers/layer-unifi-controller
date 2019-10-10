@@ -5,3 +5,5 @@ exclude:
 # include required layers here
 includes:
   - layer:basic
+  - layer:apt
+  - layer:backup
