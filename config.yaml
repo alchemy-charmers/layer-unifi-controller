@@ -11,6 +11,18 @@ options:
       default: |
         - 06E85760C0A52C50
         - 0C49F3730359A14518585931BC711F9BA15703C6
+  proxy-local:
+      type: boolean
+      description: "Set to True to restrict access via reverse-proxy to local address spaces"
+      default: True
+  proxy-subdomain:
+      type: string
+      description: "The subdomain to register with the reverseproxy"
+      default: "unifi"
+  proxy-external-port:
+      type: int
+      description: "External port for the proxy to listen on, typically 443"
+      default: 443
 #  string-option:
 #    type: string
 #    default: "Default Value"

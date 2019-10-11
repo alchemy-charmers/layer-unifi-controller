@@ -4,3 +4,9 @@
 [submodule "layers/layer-backup"]
 	path = layers/layer-backup
 	url = https://github.com/pirate-charmers/layer-backup.git
+[submodule "layers/interface-reverseproxy"]
+	path = layers/interface-reverseproxy
+	url = https://github.com/pirate-charmers/interface-reverseproxy.git
+[submodule "interfaces/interface-reverseproxy"]
+	path = interfaces/interface-reverseproxy
+	url = https://github.com/pirate-charmers/interface-reverseproxy.git

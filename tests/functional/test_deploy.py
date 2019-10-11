@@ -3,6 +3,8 @@ import pytest
 import subprocess
 import stat
 
+# import urllib.request
+
 # Treat all tests as coroutines
 pytestmark = pytest.mark.asyncio
 
@@ -10,7 +12,7 @@ juju_repository = os.getenv("JUJU_REPOSITORY", ".").rstrip("/")
 series = [
     "xenial",
     "bionic",
-    pytest.param("cosmic", marks=pytest.mark.xfail(reason="canary")),
+    # pytest.param("cosmic", marks=pytest.mark.xfail(reason="canary")),
 ]
 sources = [
     ("local", "{}/builds/unifi-controller".format(juju_repository)),
@@ -37,24 +39,38 @@ async def app(model, series, source):
 
 @pytest.mark.deploy
 async def test_unificontroller_deploy(model, series, source, request):
-   # Starts a deploy for each series
-   # Using subprocess b/c libjuju fails with JAAS
-   # https://github.com/juju/python-libjuju/issues/221
-   application_name = 'unifi-controller-{}-{}'.format(series, source[0])
-   cmd = ['juju', 'deploy', source[1], '-m', model.info.name,
-           '--series', series, application_name]
-   if request.node.get_closest_marker('xfail'):
-       # If series is 'xfail' force install to allow testing against versions not in
-       # metadata.yaml
-       cmd.append('--force')
-   subprocess.check_call(cmd)
+    # Starts a deploy for each series
+    # Using subprocess b/c libjuju fails with JAAS
+    # https://github.com/juju/python-libjuju/issues/221
+    application_name = "unifi-controller-{}-{}".format(series, source[0])
+
+    cmd = [
+        "juju",
+        "deploy",
+        source[1],
+        "-m",
+        model.info.name,
+        "--series",
+        series,
+        application_name,
+    ]
+    if request.node.get_closest_marker("xfail"):
+        # If series is 'xfail' force install to allow testing against versions not in
+        # metadata.yaml
+        cmd.append("--force")
+    subprocess.check_call(cmd)
+
+
+@pytest.mark.deploy
+async def test_haproxy_deploy(model):
+    await model.deploy("cs:~pirate-charmers/haproxy", series="xenial")
 
 
 @pytest.mark.deploy
 @pytest.mark.timeout(300)
 async def test_charm_upgrade(model, app):
     if app.name.endswith("local"):
-        pytest.skip("No need to upgrade the local deploy")
+        pytest.skip()  # No need to upgrade local deploy
     unit = app.units[0]
     await model.block_until(lambda: unit.agent_status == "idle")
     subprocess.check_call(
@@ -74,9 +90,9 @@ async def test_charm_upgrade(model, app):
 @pytest.mark.timeout(300)
 async def test_unificontroller_status(model, app):
     # Verifies status for all deployed series of the charm
-    await model.block_until(lambda: app.status == 'active')
+    await model.block_until(lambda: app.status == "active")
     unit = app.units[0]
-    await model.block_until(lambda: unit.agent_status == 'idle')
+    await model.block_until(lambda: unit.agent_status == "idle")
 
 
 # Tests
@@ -104,3 +120,28 @@ async def test_file_stat(app, jujutools):
     assert stat.filemode(fstat.st_mode) == "-rw-r--r--"
     assert fstat.st_uid == 0
     assert fstat.st_gid == 0
+
+
+@pytest.mark.timeout(45)
+async def test_add_relation(model, app):
+    haproxy = model.applications["haproxy"]
+    unifi = app
+    subdomain = app.name.split("-", 2)[2]
+    config = {"proxy-external-port": 80, "proxy-subdomain": subdomain}
+    await unifi.set_config(config)
+    await model.block_until(lambda: haproxy.status == "active")
+    await model.block_until(lambda: unifi.status == "active")
+    await unifi.add_relation("reverseproxy", "haproxy:reverseproxy")
+    await model.block_until(lambda: haproxy.status == "maintenance")
+    await model.block_until(lambda: haproxy.status == "active")
+
+
+# async def test_relation(model, app):
+#     haproxy = model.applications["haproxy"]
+#     unifi_unit = app.units[0]
+#     haproxy_unit = haproxy.units[0]
+#
+#     return_code = urllib.request.urlopen(
+#         f"https://unifi.{haproxy_unit.public_address}"
+#     ).getcode()
+#     assert return_code == 200
