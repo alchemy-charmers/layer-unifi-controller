@@ -1,4 +1,5 @@
 import os
+import ssl
 import stat
 import subprocess
 import urllib.request
@@ -122,12 +123,27 @@ async def test_file_stat(app, jujutools):
     assert fstat.st_gid == 0
 
 
+async def test_connection(model, app):
+    # Ignore self signed SSL cert directly on unit
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    unifi_unit = app.units[0]
+    address = f"https://{unifi_unit.public_address}.xip.io:8443"
+    print(f"Checking address: {address}")
+    request = urllib.request.urlopen(address, context=ctx)
+    assert request.getcode() == 200
+
+
 @pytest.mark.relate
 @pytest.mark.timeout(45)
 async def test_add_relation(model, app):
     haproxy = model.applications["haproxy"]
     unifi = app
     subdomain = app.name.split("-", 2)[2]
+    # Set the proxy-domain unique for each application
+    # Set port 80 becaues HAProxy won't have a TLS cert for testing
     config = {"proxy-external-port": "80", "proxy-subdomain": subdomain}
     await unifi.set_config(config)
     await model.block_until(lambda: haproxy.status == "active")
@@ -139,7 +155,6 @@ async def test_add_relation(model, app):
 
 async def test_relation(model, app):
     haproxy = model.applications["haproxy"]
-    # unifi_unit = app.units[0]
     haproxy_unit = haproxy.units[0]
 
     config = await app.get_config()
@@ -150,10 +165,10 @@ async def test_relation(model, app):
     info = request.info()
     print(f"Info: {info}")
     assert request.getcode() == 200
-    server_id = 'not found'
+    server_id = "not found"
     for item in info.values():
-        if 'SERVERID' in item:
-            server_id = item.split(';')[0]
+        if "SERVERID" in item:
+            server_id = item.split(";")[0]
         else:
             continue
     print(f"server_id: {server_id}")
