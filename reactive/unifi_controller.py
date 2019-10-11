@@ -1,6 +1,6 @@
-from lib_unifi_controller import UnificontrollerHelper
 from charmhelpers.core import hookenv
-from charms.reactive import set_flag, when, when_not, clear_flag, endpoint_from_name
+from charms.reactive import clear_flag, endpoint_from_name, set_flag, when, when_not
+from lib_unifi_controller import UnificontrollerHelper
 
 helper = UnificontrollerHelper()
 HEALTHY = "Unifi installed and configured"
