@@ -1,10 +1,9 @@
 import os
 import stat
 import subprocess
+import urllib.request
 
 import pytest
-
-# import urllib.request
 
 # Treat all tests as coroutines
 pytestmark = pytest.mark.asyncio
@@ -123,12 +122,13 @@ async def test_file_stat(app, jujutools):
     assert fstat.st_gid == 0
 
 
+@pytest.mark.relate
 @pytest.mark.timeout(45)
 async def test_add_relation(model, app):
     haproxy = model.applications["haproxy"]
     unifi = app
     subdomain = app.name.split("-", 2)[2]
-    config = {"proxy-external-port": 80, "proxy-subdomain": subdomain}
+    config = {"proxy-external-port": "80", "proxy-subdomain": subdomain}
     await unifi.set_config(config)
     await model.block_until(lambda: haproxy.status == "active")
     await model.block_until(lambda: unifi.status == "active")
@@ -137,12 +137,24 @@ async def test_add_relation(model, app):
     await model.block_until(lambda: haproxy.status == "active")
 
 
-# async def test_relation(model, app):
-#     haproxy = model.applications["haproxy"]
-#     unifi_unit = app.units[0]
-#     haproxy_unit = haproxy.units[0]
-#
-#     return_code = urllib.request.urlopen(
-#         f"https://unifi.{haproxy_unit.public_address}"
-#     ).getcode()
-#     assert return_code == 200
+async def test_relation(model, app):
+    haproxy = model.applications["haproxy"]
+    # unifi_unit = app.units[0]
+    haproxy_unit = haproxy.units[0]
+
+    config = await app.get_config()
+    subdomain = config["proxy-subdomain"]["value"]
+    address = f"http://{subdomain}.{haproxy_unit.public_address}.xip.io"
+    print(f"Checking address: {address}")
+    request = urllib.request.urlopen(address)
+    info = request.info()
+    print(f"Info: {info}")
+    assert request.getcode() == 200
+    server_id = 'not found'
+    for item in info.values():
+        if 'SERVERID' in item:
+            server_id = item.split(';')[0]
+        else:
+            continue
+    print(f"server_id: {server_id}")
+    assert subdomain in server_id
