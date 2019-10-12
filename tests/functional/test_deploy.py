@@ -13,7 +13,6 @@ juju_repository = os.getenv("JUJU_REPOSITORY", ".").rstrip("/")
 series = [
     "xenial",
     "bionic",
-    pytest.param("cosmic", marks=pytest.mark.xfail(reason="canary")),
 ]
 sources = [
     ("local", "{}/builds/unifi-controller".format(juju_repository)),
