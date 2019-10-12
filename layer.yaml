@@ -7,6 +7,7 @@ includes:
   - layer:basic
   - layer:apt
   - layer:backup
+  - layer:version
   - interface:reverseproxy
 repo: https://github.com/pirate-charmers/layer-unifi-controller.git
 options:
@@ -19,3 +20,5 @@ options:
     backup-method: "tgz"
     backup-files: |-
       /var/lib/unifi/backup
+  version:
+    file_name: "repo-info"

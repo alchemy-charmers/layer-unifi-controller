@@ -10,3 +10,6 @@
 [submodule "interfaces/interface-reverseproxy"]
 	path = interfaces/interface-reverseproxy
 	url = https://github.com/pirate-charmers/interface-reverseproxy.git
+[submodule "layers/layer-version"]
+	path = layers/layer-version
+	url = https://github.com/pirate-charmers/layer-version.git
