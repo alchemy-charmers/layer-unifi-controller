@@ -21,7 +21,7 @@ options:
       default: "unifi"
   proxy-external-port:
       type: int
-      description: "External port for the proxy to listen on, typically 443"
+      description: "External port for the proxy to listen on, typically 443. The proxy must use TLS on this port."
       default: 443
 #  string-option:
 #    type: string

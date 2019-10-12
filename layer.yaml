@@ -13,3 +13,7 @@ options:
     packages:
       - openjdk-8-jdk-headless
       - unifi
+  backup:
+    backup-name: "unifi-controller"
+    backup-files: |-
+      /var/lib/unifi/backup
