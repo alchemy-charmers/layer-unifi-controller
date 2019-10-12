@@ -15,5 +15,6 @@ options:
       - unifi
   backup:
     backup-name: "unifi-controller"
+    backup-method: "tgz"
     backup-files: |-
       /var/lib/unifi/backup
