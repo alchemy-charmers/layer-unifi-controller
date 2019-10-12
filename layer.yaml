@@ -8,6 +8,7 @@ includes:
   - layer:apt
   - layer:backup
   - interface:reverseproxy
+repo: https://github.com/pirate-charmers/layer-unifi-controller.git
 options:
   apt:
     packages:
