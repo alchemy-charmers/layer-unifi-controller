@@ -13,7 +13,7 @@ juju_repository = os.getenv("JUJU_REPOSITORY", ".").rstrip("/")
 series = [
     "xenial",
     "bionic",
-    # pytest.param("cosmic", marks=pytest.mark.xfail(reason="canary")),
+    pytest.param("cosmic", marks=pytest.mark.xfail(reason="canary")),
 ]
 sources = [
     ("local", "{}/builds/unifi-controller".format(juju_repository)),
@@ -97,6 +97,7 @@ async def test_unificontroller_status(model, app):
 
 
 # Tests
+@pytest.mark.timeout(30)
 async def test_example_action(app):
     unit = app.units[0]
     action = await unit.run_action("example-action")
@@ -104,6 +105,7 @@ async def test_example_action(app):
     assert action.status == "completed"
 
 
+@pytest.mark.timeout(30)
 async def test_run_command(app, jujutools):
     unit = app.units[0]
     cmd = "hostname --all-ip-addresses"
@@ -112,6 +114,7 @@ async def test_run_command(app, jujutools):
     assert unit.public_address in results["Stdout"]
 
 
+@pytest.mark.timeout(30)
 async def test_file_stat(app, jujutools):
     unit = app.units[0]
     path = "/var/lib/juju/agents/unit-{}/charm/metadata.yaml".format(
@@ -123,6 +126,7 @@ async def test_file_stat(app, jujutools):
     assert fstat.st_gid == 0
 
 
+@pytest.mark.timeout(30)
 async def test_connection(model, app):
     # Ignore self signed SSL cert directly on unit
     ctx = ssl.create_default_context()
@@ -137,7 +141,7 @@ async def test_connection(model, app):
 
 
 @pytest.mark.relate
-@pytest.mark.timeout(45)
+@pytest.mark.timeout(30)
 async def test_add_relation(model, app):
     haproxy = model.applications["haproxy"]
     unifi = app
@@ -153,6 +157,7 @@ async def test_add_relation(model, app):
     await model.block_until(lambda: haproxy.status == "active")
 
 
+@pytest.mark.timeout(30)
 async def test_relation(model, app):
     haproxy = model.applications["haproxy"]
     haproxy_unit = haproxy.units[0]
